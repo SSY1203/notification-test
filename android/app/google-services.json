@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "328464069595",
+    "project_id": "deagu-news-supporter",
+    "storage_bucket": "deagu-news-supporter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328464069595:android:4b945252118807fe7dedfe",
+        "android_client_info": {
+          "package_name": "com.notification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "328464069595-rbiigt5m0rvvn9aop4pdbfr5afav3igb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK5c0OlG0cPKjojdBSX8-8wTxEHTtPuBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "328464069595-rbiigt5m0rvvn9aop4pdbfr5afav3igb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
