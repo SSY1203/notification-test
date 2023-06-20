@@ -8,41 +8,85 @@
 
 import React, {useEffect, useState} from 'react';
 import type {Node} from 'react';
-import {SafeAreaView, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-
-// Background, Quit 상태일 경우
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('[Background Remote Message]', remoteMessage);
-});
+import PushNotification, {Importance} from 'react-native-push-notification';
 
 const App: () => Node = () => {
-  const [state, setState] = useState(false);
+  const [state, setState] = useState('');
 
   const getFcmToken = async () => {
     const fcmToken = await messaging().getToken();
-    console.log('[FCM Token] ', fcmToken);
+    setState(fcmToken);
   };
 
-  // Foreground 상태인 경우
   useEffect(() => {
     getFcmToken();
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('[Remote Message] ', JSON.stringify(remoteMessage));
-    });
-    return unsubscribe;
-  }, []);
 
-  const onToggleSubscibe = () => {
-    setState(!state);
-    if (state) {
-      callApiSubscribeTopic();
-    }
-  };
+    const configurePushNotifications = () => {
+      // Request permission for push notifications
+      const requestPermissions = async () => {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+        if (enabled) {
+          console.log('Authorization status:', authStatus);
+          getToken();
+        }
+      };
+
+      // Get the FCM device token
+      const getToken = async () => {
+        const token = await messaging().getToken();
+        console.log('Device Token:', token);
+      };
+
+      // Handle foreground push notification
+      const handleForegroundNotification = async remoteMessage => {
+        console.log('Foreground Notification:', remoteMessage);
+        // Display the notification banner
+        PushNotification.localNotification({
+          channelId: 'default',
+          title: remoteMessage.notification.title,
+          message: remoteMessage.notification.body,
+        });
+      };
+
+      // Configure push notification listeners
+      // Foreground push notification listener
+      messaging().onMessage(handleForegroundNotification);
+
+      if (Platform.OS === 'android') {
+        PushNotification.createChannel(
+          {
+            channelId: 'default',
+            channelName: 'Default Channel',
+            channelDescription: 'Default Notification Channel',
+            soundName: 'default',
+            importance: 4,
+            vibrate: true,
+          },
+          created => console.log(`createChannel default returned '${created}'`),
+        );
+
+        requestPermissions();
+      }
+    };
+
+    configurePushNotifications();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={onToggleSubscibe} style={styles.button}>
+      <TouchableOpacity style={styles.button}>
         <Text style={styles.text}>구독</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button}>
