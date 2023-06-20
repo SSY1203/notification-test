@@ -13,6 +13,7 @@
     "@react-native-community/push-notification-ios": "^1.11.0",
     "@react-native-firebase/app": "^18.0.0",
     "@react-native-firebase/messaging": "^18.0.0",
+    "firebase-admin": "^11.9.0",
     "react": "17.0.2",
     "react-native": "^0.68.5",
     "react-native-push-notification": "^8.1.1"

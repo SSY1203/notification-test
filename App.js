@@ -15,7 +15,10 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import messaging, {
+  onMessage,
+  getMessaging,
+} from '@react-native-firebase/messaging';
 import PushNotification, {Importance} from 'react-native-push-notification';
 
 const App: () => Node = () => {
@@ -52,6 +55,7 @@ const App: () => Node = () => {
       // Handle foreground push notification
       const handleForegroundNotification = async remoteMessage => {
         console.log('Foreground Notification:', remoteMessage);
+
         // Display the notification banner
         PushNotification.localNotification({
           channelId: 'default',
@@ -64,49 +68,41 @@ const App: () => Node = () => {
       // Foreground push notification listener
       messaging().onMessage(handleForegroundNotification);
 
-      if (Platform.OS === 'android') {
-        PushNotification.createChannel(
-          {
-            channelId: 'default',
-            channelName: 'Default Channel',
-            channelDescription: 'Default Notification Channel',
-            soundName: 'default',
-            importance: 4,
-            vibrate: true,
-          },
-          created => console.log(`createChannel default returned '${created}'`),
-        );
-
-        requestPermissions();
-      }
+      requestPermissions();
     };
-
     configurePushNotifications();
   }, []);
 
+  const onSubscribeTopic = async (topic = 'dash') => {
+    //   return instance.post('/push');
+    const response = await messaging().subscribeToTopic(topic);
+    console.log(`${topic} 구독 성공~!`);
+    console.log(`${response}`);
+  };
+
+  const message = {
+    data: {
+      title: '청년 정책 알림이~~~',
+      body: '구독과 좋아요, 알림 설정까지~',
+    },
+    topic: 'dash',
+  };
+
+  const onSendMessage = async () => {};
+
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        onPress={() => onSubscribeTopic('job')}
+        style={styles.button}>
         <Text style={styles.text}>구독</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity onPress={() => onSendMessage()} style={styles.button}>
         <Text style={styles.text}>구독 취소</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
-
-export function callApiSubscribeTopic(topic = 'dash') {
-  //   return instance.post('/push');
-  return messaging()
-    .subscribeToTopic(topic)
-    .then(() => {
-      console.log(`${topic} 구독 성공!!`);
-    })
-    .catch(() => {
-      console.log(`${topic} 구독 실패! ㅜㅜ`);
-    });
-}
 
 const styles = StyleSheet.create({
   container: {
